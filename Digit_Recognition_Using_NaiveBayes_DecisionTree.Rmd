@@ -1,0 +1,99 @@
+---
+title: "Digit Recognition"
+author: "Abhirupa"
+date: "22 November 2017"
+output: word_document
+---
+
+```{r}
+train <- read.csv("C:/Users/Administrator/Desktop/Digit/train.csv")
+```
+
+#Checking Structure of data 
+
+```{r}
+str(train)
+colnames(train)
+```
+
+#converting label to factor
+```{r}
+as.factor(train$label)->train$label
+```
+
+#Sampling
+
+```{r}
+index=sample(1:nrow(train),size = 0.85*nrow(train),replace = F)
+train_sampled=train[index,]
+test_sampled=train[-index,]
+```
+
+#Machine Learning Libraries 
+```{r}
+#Knn
+library(class)
+
+#Decision Tree
+library(tree)
+
+#Naive Bayes
+library(e1071)
+
+#Random Forest
+library(randomForest)
+```
+
+#Checking Accuracy 
+```{r}
+model1=naiveBayes(label~.,data=train)
+#model2=knn(train=train_sampled[,-c(1)],test=test_sampled[,-c(1)],cl=train_sampled[,c(1)],k=3)
+model3=tree(label~.,data=train)
+#model4=randomForest(label~.,data=train_sampled)
+```
+
+
+```{r}
+pred1=predict(model1,test_sampled,type = "class")
+pred3=predict(model3,test_sampled,type = "class")
+```
+
+```{r}
+table(pred1,test_sampled$label)->conf1
+table(pred3,test_sampled$label)->conf3
+conf1
+conf3
+```
+
+```{r}
+accuracy1=sum(diag(conf1))/nrow(test_sampled)
+accuracy3=sum(diag(conf3))/nrow(test_sampled)
+accuracy1*100
+accuracy3*100
+
+```
+
+```{r}
+test <- read.csv("C:/Users/Administrator/Desktop/Digit/test.csv")
+```
+
+```{r}
+pred1=predict(model1,test,type = "class")
+pred3=predict(model3,test,type = "class")
+```
+
+```{r}
+submission <- read.csv("C:/Users/Administrator/Desktop/Digit/sample_submission.csv")
+
+```
+
+```{r}
+Label=pred1
+ImageId=submission$ImageId
+data.frame(ImageId,Label)->recon_digits
+```
+
+```{r}
+write.csv(recon_digits,"C:/Users/Administrator/Desktop/Digit/recon_digits1.csv",row.names = F)
+```
+
